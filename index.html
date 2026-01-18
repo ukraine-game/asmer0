@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-screen">
+        <div class="auth-box">
+            <h2 style="text-align:center; color: white; margin-bottom: 20px;">Вітаємо!</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="text" id="username" placeholder="Логін">
+                <input type="password" id="password" placeholder="Пароль">
+                <button onclick="login()">Увійти</button>
+                <button onclick="register()" class="secondary">Зареєструватися</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-screen" style="display: none;">
+        
+        <div class="guilds-sidebar">
+            <div class="guild-icon home active" id="home-btn" onclick="switchToGeneral()" title="Особисті повідомлення">
+                <img src="https://cdn.prod.website-files.com/6257adef93867e50d84a30e2/636e0a6a49f9a757c1110ffb_full_logo_white_RGB.png" width="25">
+            </div>
+            <div class="guild-separator"></div>
+            <div id="user-guilds-list">
+                </div>
+            <div class="guild-icon plus" onclick="showGuildModal()" title="Додати сервер">+</div>
+        </div>
+
+        <div class="channels-sidebar">
+            <div class="search-container">
+                <button class="search-btn" onclick="showSearchInput()">Знайти або почати розмову</button>
+            </div>
+            
+            <div class="sidebar-scrollable">
+                <div class="category-header">ПРИВАТНІ ПОВІДОМЛЕННЯ</div>
+                <div id="private-chats">
+                    </div>
+            </div>
+
+            <div class="user-settings-bar">
+                <div class="user-info">
+                    <div class="avatar-wrapper">
+                        <img id="my-avatar" src="/img/default.png">
+                        <div class="status-dot online"></div>
+                    </div>
+                    <div class="user-text">
+                        <div id="my-name">Username</div>
+                        <div class="user-tag">#online</div>
+                    </div>
+                </div>
+                <div class="user-controls">
+                    <button onclick="toggleSettings()">⚙️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-top-nav">
+                <div class="chat-header-info">
+                    <span class="hash">#</span>
+                    <h3 id="chat-title">загальний</h3>
+                    <div id="chat-status-text" style="margin-left: 10px; font-size: 12px; color: #949ba4;"></div>
+                </div>
+                <div class="chat-header-tools">
+                    <button id="invite-people-btn" onclick="showInviteList()" style="display:none; background:none; border:none; cursor:pointer; font-size:20px; color: #dbdee1;">👤+</button>
+                    <button id="call-btn" onclick="startCall()" style="display:none; background:none; border:none; cursor:pointer; font-size:20px; color: #dbdee1;">📞</button>
+                </div>
+            </div>
+
+            <div id="messages"></div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <button class="attach-btn">+</button>
+                    <input type="text" id="msg-input" placeholder="Написати повідомлення...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="guild-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Налаштування серверів</h2>
+            <input type="text" id="guild-name" placeholder="Назва сервера">
+            <button onclick="createGuild()">Створити сервер</button>
+            <div class="modal-separator" style="margin: 20px 0; color: #949ba4;">АБО</div>
+            <input type="text" id="invite-input" placeholder="Код запрошення">
+            <button onclick="joinGuild()" class="secondary">Приєднатися за кодом</button>
+            <button onclick="closeModals()" class="close-link" style="background:none; color:#949ba4; margin-top:10px;">Назад</button>
+        </div>
+    </div>
+
+    <div id="invite-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Запросити друзів</h2>
+            <p style="color: #949ba4; margin-bottom: 15px;">Оберіть друга, щоб надіслати йому код запрошення:</p>
+            <div id="friends-to-invite-list" style="max-height: 250px; overflow-y: auto; text-align: left;">
+                </div>
+            <button onclick="closeModals()" class="secondary" style="width: 100%;">Закрити</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Мій профіль</h2>
+            <input type="text" id="edit-username">
+            <input type="file" id="edit-avatar-file" accept="image/*">
+            <button onclick="saveProfile()">Зберегти</button>
+            <button onclick="logout()" class="logout-btn" style="background:#ed4245; margin-left: 10px;">Вийти</button>
+            <button onclick="closeModals()" class="secondary">Назад</button>
+        </div>
+    </div>
+
+    <div id="call-screen" class="call-overlay" style="display:none;">
+        <div class="call-box">
+            <h3 id="call-status">Виклик...</h3>
+            <video id="remote-video" autoplay playsinline style="width: 100%; max-width: 800px; border-radius: 8px;"></video>
+            <div class="call-actions" style="margin-top: 20px;">
+                <button onclick="endCall()" style="background:#ed4245; padding: 15px 30px; border-radius: 30px;">Покласти трубку</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <input type="text" id="search-input" placeholder="Введіть логін...">
+            <button onclick="searchUser()">Почати чат</button>
+            <button onclick="closeModals()" class="secondary">Закрити</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+    <script src="bd.txt"></script>
+</body>
+</html>
